@@ -1,0 +1,29 @@
+type,value
+ring,Core
+ring,Adopt
+ring,Trial
+ring,Assess
+ring,Hold
+quadrant,CORE
+quadrant,Intelligence
+quadrant,Visualization
+quadrant,Data
+quadrant,Standards
+tag,Techniques
+tag,Platform
+tag,Core Library
+tag,Server-Side
+tag,Web-Tools
+tag,Desktop
+tag,Mobile
+tag,Data Repository
+tag,Database
+tag,Data management
+tag,Spatial analysis
+tag,EO visualization
+tag,Location parsing and EO referencing
+tag,Remote sensing analysis
+tag,Pangeo
+tag,3D modeling
+tag,Cartography and visualisation
+tag,Geocoding and georeferencing

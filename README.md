@@ -10,7 +10,14 @@ An Earth and Space Observation Tech Radar for Downstream Science, Analytics, and
 To update radar content, edit `config/eo.csv` and/or `config/space.csv`, then commit and push your changes.
 The app reads these CSV files directly, and GitHub Actions deploys the site automatically.
 
-# Dev
+# Contributing to the Space Tech Radar!
+
+Contributions are welcome:
+
+- Open source tools, libraries, standards and datasets for Earth and space observation
+- Ring suggestions: should something move to Adopt, Trial, Assess or Hold, and why?
+- Fixes to broken links, outdated descriptions and missing tags
+- Examples and case studies for the story sections
 
 ## What It Includes
 
@@ -64,3 +71,12 @@ python3 -m http.server 8080
 
 Open `http://localhost:8080`.
 
+
+
+## Test
+
+```bash
+python3 tests/validate_entries.py
+```
+
+Checks that every entry in `config/eo.csv` and `config/space.csv` uses a quadrant, ring and tags listed in `config/rules.csv`, and that names are not duplicated.
