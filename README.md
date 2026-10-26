@@ -60,6 +60,7 @@ Contributions are welcome:
 - Location parsing and EO referencing
 - Remote sensing analysis
 - Pangeo
+- Simulation
 
 ## Run Locally
 
