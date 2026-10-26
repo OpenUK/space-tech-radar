@@ -4,8 +4,9 @@ ring,Adopt
 ring,Trial
 ring,Assess
 ring,Hold
+ring,Dead
 quadrant,CORE
-quadrant,Intelligence
+quadrant,Analytics
 quadrant,Visualization
 quadrant,Data
 quadrant,Standards

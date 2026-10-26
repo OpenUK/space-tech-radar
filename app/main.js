@@ -43,7 +43,7 @@ const RINGS = [
   { name: "Assess", color: "#d79a00" },
   { name: "Hold", color: "#c8553d" }
 ];
-const QUADRANTS = ["Intelligence", "Visualization", "Data", "Standards"];
+const QUADRANTS = ["Analytics", "Visualization", "Data", "Standards"];
 const REQUIRED_ENTRY_FIELDS = [
   "Name",
   "Quadrant",
@@ -58,7 +58,7 @@ const REQUIRED_ENTRY_FIELDS = [
   "Languages"
 ];
 const QUADRANT_DESCRIPTIONS = {
-  intelligence: "Tools and methods that turn raw observations into analysis, models, forecasts, and decisions.",
+  analytics: "Tools and methods that turn raw observations into analysis, models, forecasts, and decisions.",
   visualization: "Interfaces and rendering tools that make observations explorable, interpretable, and shareable.",
   data: "Catalogs, platforms, and data-access tooling used to discover, retrieve, and work with mission datasets.",
   standards: "Shared formats, metadata models, and protocols that make systems interoperable and results reproducible."
@@ -301,6 +301,7 @@ async function loadRadarData(mode) {
 
   rows.forEach((row) => {
     if (!Object.values(row).some((value) => String(value || "").trim())) return;
+    if (sanitizeCsvText(row.Ring).toLowerCase() === "dead") return;
 
     const name = sanitizeCsvText(row.Name);
     const quadrantLabel = sanitizeCsvText(row.Quadrant);

@@ -9,6 +9,8 @@ An Earth and Space Observation Tech Radar for Downstream Science, Analytics, and
 
 To update radar content, edit `config/eo.csv` and/or `config/space.csv`, then commit and push your changes.
 The app reads these CSV files directly, and GitHub Actions deploys the site automatically.
+Keep entries considered but removed in the CSV with `Ring` set to `Dead`; they are hidden from the radar, and duplicate-name validation prevents adding them again.
+Use the optional `Comment` field for notes, including why an entry was removed; comments are not displayed on the radar.
 
 # Contributing to the Space Tech Radar!
 
@@ -30,7 +32,7 @@ Contributions are welcome:
 
 - Core Libraries (inner circle)
 - Visualization
-- Intelligence
+- Analytics
 - Data
 - Standards
 
@@ -80,4 +82,4 @@ Open `http://localhost:8080`.
 python3 tests/validate_entries.py
 ```
 
-Checks that every entry in `config/eo.csv` and `config/space.csv` uses a quadrant, ring and tags listed in `config/rules.csv`, and that names are not duplicated.
+Checks that every entry in `config/eo.csv` and `config/space.csv` uses a quadrant, ring and tags listed in `config/rules.csv`, and that names are not duplicated (including `Dead` entries).
