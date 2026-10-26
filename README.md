@@ -8,7 +8,7 @@ An Earth and Space Observation Tech Radar for Downstream Science, Analytics, and
 </a>
 
 To update radar content, edit `config/eo.csv` and/or `config/space.csv`, then commit and push your changes.
-The GitHub Actions workflow regenerates the radar config files and redeploys the site automatically.
+The app reads these CSV files directly, and GitHub Actions deploys the site automatically.
 
 # Dev
 
@@ -64,36 +64,3 @@ python3 -m http.server 8080
 
 Open `http://localhost:8080`.
 
-
-## Generate Config from CSV
-
-```bash
-python3 scripts/csv_to_radar_config.py eo config/eo.csv
-python3 scripts/csv_to_radar_config.py space config/space.csv
-```
-
-## GitHub Actions Automation
-
-Workflow: `.github/workflows/csv-radar.yml`
-
-Behavior:
-
-- Triggers on changes to `config/eo.csv` or `config/space.csv`
-- Regenerates:
-  - `config/earth/radar.config.json`
-  - `config/space/radar.config.json`
-- Commits generated config updates to the branch
-- Redeploys GitHub Pages on pushes to the default branch
-
-Source of truth:
-
-- Edit only `config/eo.csv` and `config/space.csv` for radar data changes
-- Do not manually edit `config/earth/radar.config.json` or `config/space/radar.config.json`
-
-Optional per-entry markdown overrides are supported in `radar-text.md` before `# Section`:
-
-```md
-## Entry Name
-linkName: docs.example.com
-Custom popup description...
-```

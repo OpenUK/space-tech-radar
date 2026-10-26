@@ -16,15 +16,34 @@ const RADAR = {
 };
 
 const MODES = {
-  earth: { key: "earth", word: "Earth", root: "config/earth" },
-  space: { key: "space", word: "Space", root: "config/space" }
+  earth: {
+    key: "earth",
+    word: "Earth",
+    csv: "config/eo.csv",
+    root: "config/earth",
+    quadrantColors: ["#0ea5e9", "#16a34a", "#eab308", "#dc2626"]
+  },
+  space: {
+    key: "space",
+    word: "Space",
+    csv: "config/space.csv",
+    root: "config/space",
+    quadrantColors: ["#14b8a6", "#3b82f6", "#a855f7", "#f97316"]
+  }
 };
 
-const FALLBACK_QUADRANT_COLORS = ["#3b82f6", "#14b8a6", "#a855f7", "#f97316"];
 const CORE = {
   label: "CORE",
   fallbackColor: "#0f766e"
 };
+const RINGS = [
+  { name: "Core", color: "#0f766e" },
+  { name: "Adopt", color: "#1e9f5b" },
+  { name: "Trial", color: "#1f83c2" },
+  { name: "Assess", color: "#d79a00" },
+  { name: "Hold", color: "#c8553d" }
+];
+const QUADRANTS = ["Intelligence", "Visualization", "Data", "Standards"];
 const REQUIRED_ENTRY_FIELDS = [
   "Name",
   "Quadrant",
@@ -48,6 +67,11 @@ const QUADRANT_DESCRIPTIONS = {
 const $ = (id) => document.getElementById(id);
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const normalizeNewlines = (text) => (text || "").replace(/\r\n?/g, "\n");
+const sanitizeCsvText = (value) =>
+  String(value ?? "")
+    .replace(/\r\n?/g, "\n")
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, "")
+    .trim();
 const joinPath = (base, part) => `${base.replace(/\/+$/, "")}/${part.replace(/^\/+/, "")}`;
 const slugify = (value) =>
   String(value || "")
@@ -64,10 +88,15 @@ function quadrantDescription(name) {
   return QUADRANT_DESCRIPTIONS[slugify(name)] || "Technologies and practices in this quadrant of the radar.";
 }
 
-async function fetchJson(path) {
+async function fetchCsv(path) {
   const response = await fetch(path);
   if (!response.ok) throw new Error(`Failed to load ${path}: ${response.status}`);
-  return response.json();
+  const csv = d3.csvParse(await response.text());
+  const missing = REQUIRED_ENTRY_FIELDS.filter((field) => !csv.columns.includes(field));
+  if (missing.length) {
+    throw new Error(`Invalid ${path}: missing required columns: ${missing.join(", ")}.`);
+  }
+  return csv;
 }
 
 async function fetchText(path) {
@@ -120,10 +149,10 @@ function normalizeRadarEntry(rawEntry, ringIndexByName, { isCore, expectedQuadra
     throw new Error(`Invalid entry: missing required fields: ${missing.join(", ")}.`);
   }
 
-  const name = String(rawEntry.Name || "").trim();
+  const name = sanitizeCsvText(rawEntry.Name);
   if (!name) throw new Error("Invalid entry: Name is required.");
 
-  const quadrantLabel = String(rawEntry.Quadrant || "").trim();
+  const quadrantLabel = sanitizeCsvText(rawEntry.Quadrant);
   if (!quadrantLabel) throw new Error(`Invalid entry "${name}": Quadrant is required.`);
 
   if (expectedQuadrant && quadrantLabel.toLowerCase() !== String(expectedQuadrant).toLowerCase()) {
@@ -136,7 +165,7 @@ function normalizeRadarEntry(rawEntry, ringIndexByName, { isCore, expectedQuadra
     throw new Error(`Invalid core entry "${name}": Quadrant must be "${CORE.label}".`);
   }
 
-  const ringLabel = String(rawEntry.Ring || "").trim();
+  const ringLabel = sanitizeCsvText(rawEntry.Ring);
   if (!ringLabel) throw new Error(`Invalid entry "${name}": Ring is required.`);
 
   const ring = ringIndexByName.get(ringLabel.toLowerCase());
@@ -151,21 +180,33 @@ function normalizeRadarEntry(rawEntry, ringIndexByName, { isCore, expectedQuadra
     throw new Error(`Invalid entry "${name}": non-core entries cannot use Ring "${CORE.label}".`);
   }
 
-  const link = String(rawEntry.Link || "").trim();
+  const link = sanitizeCsvText(rawEntry.Link);
   if (!link) throw new Error(`Invalid entry "${name}": Link is required.`);
+  let parsedLink;
+  try {
+    parsedLink = new URL(link);
+  } catch (error) {
+    throw new Error(`Invalid entry "${name}": Link must be an absolute HTTP(S) URL.`, { cause: error });
+  }
+  if (!["http:", "https:"].includes(parsedLink.protocol) || parsedLink.username || parsedLink.password) {
+    throw new Error(`Invalid entry "${name}": Link must be an absolute HTTP(S) URL without credentials.`);
+  }
 
   const moved = Number(rawEntry.Moved);
   if (!Number.isInteger(moved) || ![-1, 0, 1].includes(moved)) {
     throw new Error(`Invalid entry "${name}": Moved must be -1, 0, or 1.`);
   }
 
-  const description = String(rawEntry.Description || "").trim();
+  const description = sanitizeCsvText(rawEntry.Description);
   if (!description) throw new Error(`Invalid entry "${name}": Description is required.`);
 
   if (!Array.isArray(rawEntry.Tags)) {
     throw new Error(`Invalid entry "${name}": Tags must be an array.`);
   }
-  const tags = rawEntry.Tags.map((tag) => String(tag).trim()).filter(Boolean);
+  if (rawEntry.Tags.some((tag) => typeof tag !== "string")) {
+    throw new Error(`Invalid entry "${name}": Tags must contain only text values.`);
+  }
+  const tags = rawEntry.Tags.map(sanitizeCsvText).filter(Boolean);
   if (!tags.length) throw new Error(`Invalid entry "${name}": Tags must include at least one value.`);
 
   const downloads = Number(rawEntry.Downloads);
@@ -188,9 +229,9 @@ function normalizeRadarEntry(rawEntry, ringIndexByName, { isCore, expectedQuadra
     throw new Error(`Invalid entry "${name}": Languages must be an object.`);
   }
 
-  const languages = {};
+  const languages = Object.create(null);
   Object.entries(languagesInput).forEach(([language, amount]) => {
-    const languageName = String(language).trim();
+    const languageName = sanitizeCsvText(language);
     const languageAmount = Number(amount);
     if (!languageName) {
       throw new Error(`Invalid entry "${name}": Languages keys must be non-empty strings.`);
@@ -205,8 +246,6 @@ function normalizeRadarEntry(rawEntry, ringIndexByName, { isCore, expectedQuadra
 
   return {
     name,
-    quadrantLabel,
-    ringLabel,
     ring,
     link,
     moved,
@@ -219,38 +258,78 @@ function normalizeRadarEntry(rawEntry, ringIndexByName, { isCore, expectedQuadra
   };
 }
 
+function parseCsvTags(rawTags, entryName) {
+  const tags = sanitizeCsvText(rawTags);
+  if (!tags) return [];
+  if (tags.startsWith("[")) {
+    try {
+      return JSON.parse(tags);
+    } catch (error) {
+      throw new Error(`Invalid entry "${entryName}": Tags must contain valid JSON.`, { cause: error });
+    }
+  }
+  for (const separator of ["|", ";", ","]) {
+    if (tags.includes(separator)) {
+      return tags.split(separator).map((tag) => tag.trim()).filter(Boolean);
+    }
+  }
+  return [tags];
+}
+
+function parseCsvLanguages(rawLanguages, entryName) {
+  const languages = sanitizeCsvText(rawLanguages) || "{}";
+  try {
+    return JSON.parse(languages);
+  } catch (error) {
+    throw new Error(`Invalid entry "${entryName}": Languages must contain valid JSON.`, { cause: error });
+  }
+}
+
 async function loadRadarData(mode) {
-  const configPath = joinPath(mode.root, "radar.config.json");
-  const config = await fetchJson(configPath);
-  const rings = Array.isArray(config.rings) ? config.rings : [];
-  const hasCoreRing = String(rings[0]?.name || "").trim().toLowerCase() === "core";
-  if (!hasCoreRing) throw new Error(`Invalid ${configPath}: first ring must be "Core".`);
+  const rows = await fetchCsv(mode.csv);
+  const rings = RINGS;
   const ringIndexByName = new Map(
     rings.map((ring, index) => [String(ring?.name || "").trim().toLowerCase(), index])
   );
 
-  const textPath = config.textFile ? joinPath(mode.root, config.textFile) : null;
-  const coreEntries = Array.isArray(config?.core?.entries) ? config.core.entries : [];
-  const quadrantDocs = Array.isArray(config?.quadrants) ? config.quadrants : [];
-
-  const storyMarkdown = textPath ? await fetchText(textPath) : "";
+  const storyMarkdown = await fetchText(joinPath(mode.root, "radar-text.md"));
 
   const textOverrides = parseEntryTextOverrides(storyMarkdown);
-  const quadrants = [];
-  const quadrantColors = [];
+  const quadrants = QUADRANTS;
+  const quadrantColors = mode.quadrantColors;
   const entries = [];
 
-  coreEntries.forEach((entry) => {
-    const normalized = normalizeRadarEntry(entry, ringIndexByName, {
-      isCore: true,
-      expectedQuadrant: CORE.label
-    });
+  rows.forEach((row) => {
+    if (!Object.values(row).some((value) => String(value || "").trim())) return;
+
+    const name = sanitizeCsvText(row.Name);
+    const quadrantLabel = sanitizeCsvText(row.Quadrant);
+    const isCore = quadrantLabel.toUpperCase() === CORE.label;
+    const quadrant = isCore
+      ? null
+      : quadrants.findIndex((quadrantName) => quadrantName.toLowerCase() === quadrantLabel.toLowerCase());
+    if (!isCore && quadrant < 0) {
+      throw new Error(`Invalid entry "${name}": Quadrant "${quadrantLabel}" is not recognized.`);
+    }
+
+    const normalized = normalizeRadarEntry(
+      {
+        ...row,
+        Tags: parseCsvTags(row.Tags, name),
+        Languages: parseCsvLanguages(row.Languages, name)
+      },
+      ringIndexByName,
+      {
+        isCore,
+        expectedQuadrant: isCore ? CORE.label : quadrants[quadrant]
+      }
+    );
     const override = textOverrides.get(normalized.name) || {};
     entries.push({
       name: normalized.name,
-      ring: 0,
-      quadrant: null,
-      isCore: true,
+      ring: normalized.ring,
+      quadrant,
+      isCore,
       link: normalized.link,
       moved: normalized.moved,
       description: override.description || normalized.description,
@@ -260,39 +339,6 @@ async function loadRadarData(mode) {
       forks: normalized.forks,
       activityMetric: normalized.activityMetric,
       languages: normalized.languages
-    });
-  });
-
-  quadrantDocs.forEach((doc) => {
-    const q = doc.quadrant;
-    if (!q || typeof q.index !== "number" || !q.name) {
-      throw new Error("Invalid quadrant config.");
-    }
-
-    quadrants[q.index] = q.name;
-    quadrantColors[q.index] = q.color || FALLBACK_QUADRANT_COLORS[q.index % FALLBACK_QUADRANT_COLORS.length];
-
-    (doc.entries || []).forEach((entry) => {
-      const normalized = normalizeRadarEntry(entry, ringIndexByName, {
-        isCore: false,
-        expectedQuadrant: q.name
-      });
-      const override = textOverrides.get(normalized.name) || {};
-      entries.push({
-        name: normalized.name,
-        ring: normalized.ring,
-        quadrant: q.index,
-        isCore: false,
-        link: normalized.link,
-        moved: normalized.moved,
-        description: override.description || normalized.description,
-        linkName: override.linkName || hostname(normalized.link),
-        tags: normalized.tags,
-        downloads: normalized.downloads,
-        forks: normalized.forks,
-        activityMetric: normalized.activityMetric,
-        languages: normalized.languages
-      });
     });
   });
 
@@ -342,17 +388,14 @@ function appendQuadrantDetails(body, data) {
       left.name.localeCompare(right.name)
     );
 
-    if (!entries.length) {
+    const entryNames = entries.length
+      ? entries.map((entry) => entry.name)
+      : ["No technologies currently listed in this mode."];
+    entryNames.forEach((name) => {
       const item = document.createElement("li");
-      item.textContent = "No technologies currently listed in this mode.";
+      item.textContent = name;
       list.appendChild(item);
-    } else {
-      entries.forEach((entry) => {
-        const item = document.createElement("li");
-        item.textContent = entry.name;
-        list.appendChild(item);
-      });
-    }
+    });
 
     section.append(title, description, techTitle, list);
     details.appendChild(section);
@@ -521,12 +564,11 @@ function boundsForQuadrant(quadrant) {
 }
 
 function ringRadiusBounds(ring, ringStep) {
-  const coreInset = RADAR.dotRadius + 4 + RADAR.ringEdgePadding;
-  const ringInset = RADAR.ringInset + RADAR.ringEdgePadding;
-  const innerInset = ring === 0 ? coreInset : ringInset;
-  const outerInset = ring === 0 ? coreInset : ringInset;
-  const minRadius = ring * ringStep + innerInset;
-  const maxRadius = (ring + 1) * ringStep - outerInset;
+  const inset = ring === 0
+    ? RADAR.dotRadius + 4 + RADAR.ringEdgePadding
+    : RADAR.ringInset + RADAR.ringEdgePadding;
+  const minRadius = ring * ringStep + inset;
+  const maxRadius = (ring + 1) * ringStep - inset;
   return [Math.min(minRadius, maxRadius), Math.max(minRadius, maxRadius)];
 }
 
@@ -1029,22 +1071,18 @@ function setModeUI(modeKey) {
     subtitleText.textContent = `${mode.word} Observation Tech Radar for Downstream Science, Analytics, and Applications`;
   }
 
-  if (toggleVisualButton) {
-    toggleVisualButton.classList.toggle("is-space", isSpace);
-    toggleVisualButton.setAttribute("aria-pressed", String(isSpace));
-    toggleVisualButton.setAttribute("aria-label", switchLabel);
-  }
-
-  if (toggleWordButton) {
-    toggleWordButton.classList.toggle("is-space", isSpace);
-    toggleWordButton.setAttribute("aria-pressed", String(isSpace));
-    toggleWordButton.setAttribute("aria-label", switchLabel);
-  }
+  [toggleVisualButton, toggleWordButton].forEach((button) => {
+    if (!button) return;
+    button.classList.toggle("is-space", isSpace);
+    button.setAttribute("aria-pressed", String(isSpace));
+    button.setAttribute("aria-label", switchLabel);
+  });
 }
 
 function setToggleDisabled(disabled) {
-  if (toggleWordButton) toggleWordButton.disabled = disabled;
-  if (toggleVisualButton) toggleVisualButton.disabled = disabled;
+  [toggleWordButton, toggleVisualButton].forEach((button) => {
+    if (button) button.disabled = disabled;
+  });
 }
 
 function showLoadError(error) {
