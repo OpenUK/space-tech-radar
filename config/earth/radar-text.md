@@ -56,5 +56,3 @@ Earth Observation and space observation might serve different domains, but their
 Both ecosystems are Python-based and organised around a community core project. In EO, that centre is Pangeo: Xarray, Dask, and Zarr. In space observation, Astropy fills the equivalent role. These are not single tools but gravitational centres for wider ecosystems, and the gap between them is closing. An astropy-xarray bridge already lets astronomical data flow through EO workflows.
 
 The clearest example of convergence is HEALPix. Built for astronomy to map cosmic background radiation, it divides the celestial sphere into hierarchical, equal-area cells. In 2016, researchers in New Zealand adapted it for terrestrial use on the WGS84 ellipsoid. Today, xdggs brings HEALPix into Xarray, and the representation has been adopted in DestinE's Climate Digital Twin. An algorithm designed to map the afterglow of the Big Bang is now tiling the Earth for operational climate projection. The same cross-sharing of ideas appears in data discovery, where the USGS Astrogeology Science Center is prototyping STAC catalogues for Mars and Europa imagery using COG formats from EO
-
-..

@@ -1093,10 +1093,25 @@ function showLoadError(error) {
   }
 }
 
+function renderLegend(entries) {
+  $("radar-legend")?.replaceChildren(
+    ...RINGS.map((ring, index) => {
+      const item = document.createElement("li");
+      item.style.setProperty("--dot", ring.color);
+      item.append(
+        d3.create("span").attr("class", "legend-name").text(ring.name).node(),
+        d3.create("span").attr("class", "legend-count").text(entries.filter((entry) => entry.ring === index).length).node()
+      );
+      return item;
+    })
+  );
+}
+
 async function loadAndRender(modeKey) {
   const ticket = ++loadTicket;
   const data = await loadRadarData(modeFor(modeKey));
   if (ticket !== loadTicket) return;
+  renderLegend(data.entries);
   renderRadar(data, popupController);
 }
 
