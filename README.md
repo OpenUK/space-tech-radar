@@ -80,14 +80,12 @@ Checks that every entry in `radar/eo.csv` and `radar/space.csv` uses a quadrant,
 
 ## Supported By
 
-[OpenUK](https://openuk.uk/)
-
-<a href="https://openuk.uk/">
-  <img src="app/assets/logos/openuk.png" alt="OpenUK" width="240" />
-</a>
-
-[Lampata](https://lampata.co.uk/)
-
-<a href="https://lampata.co.uk/">
-  <img src="app/assets/logos/lampata.svg" alt="Lampata" width="240" />
-</a>
+<p>
+  <a href="https://openuk.uk/">
+    <img src="app/assets/logos/openuk.png" alt="OpenUK" width="240" />
+  </a>
+  &nbsp;&nbsp;
+  <a href="https://lampata.co.uk/">
+    <img src="app/assets/logos/lampata.svg" alt="Lampata" width="240" />
+  </a>
+</p>
