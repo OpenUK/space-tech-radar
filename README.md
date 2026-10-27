@@ -76,7 +76,10 @@ Checks that every entry in `radar/eo.csv` and `radar/space.csv` uses a quadrant,
 
 ## Maintainers
 
-Maintained by:
+- [@sunnydean](https://github.com/sunnydean)
+
+## Supported By
+
 [Lampata](https://lampata.co.uk/)
 
 <a href="https://lampata.co.uk/">
