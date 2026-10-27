@@ -32,6 +32,8 @@ The app reads these CSV files directly, and GitHub Actions deploys the site auto
 Keep entries considered but removed in the CSV with `Ring` set to `Dead`; they are hidden from the radar, and duplicate-name validation prevents adding them again.
 Use the optional `Comment` field for notes, including why an entry was removed; comments are not displayed on the radar. For general-purpose foundations, explain their role and link to a concrete observation workflow in `Comment`.
 
+Contributions to this project are subject to [OpenUK's Code of Respect policy](https://openuk.uk/wp-content/uploads/2020/08/Code-of-respect-Final-Aug-20.pdf).
+
 ## Disclaimer
 
 This radar is human-maintained and reflects the judgement of its contributors. Please do not submit LLM-generated edits; contributions should be written and checked by a human.
