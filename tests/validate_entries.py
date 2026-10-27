@@ -7,11 +7,11 @@ def read(path):
     return [{k: re.sub(r"[\x00-\x1f\x7f]", "", v or "").strip() for k, v in r.items()} for r in rows]
 
 rules = {}
-for r in read("config/rules.csv"):
+for r in read("radar/rules.csv"):
     rules.setdefault(r["type"], set()).add(r["value"])
 
 errors = []
-for path in ("config/eo.csv", "config/space.csv"):
+for path in ("radar/eo.csv", "radar/space.csv"):
     seen = set()
     for r in read(path):
         name = f"{path}: {r['Name']}"

@@ -21,15 +21,15 @@ const MODES = {
   earth: {
     key: "earth",
     word: "Earth",
-    csv: "config/eo.csv",
-    root: "config/earth",
+    csv: "radar/eo.csv",
+    root: "radar/earth",
     quadrantColors: ["#0ea5e9", "#16a34a", "#eab308", "#dc2626"]
   },
   space: {
     key: "space",
     word: "Space",
-    csv: "config/space.csv",
-    root: "config/space",
+    csv: "radar/space.csv",
+    root: "radar/space",
     quadrantColors: ["#14b8a6", "#3b82f6", "#a855f7", "#f97316"]
   }
 };
