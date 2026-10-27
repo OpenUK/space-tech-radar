@@ -58,9 +58,9 @@ const REQUIRED_ENTRY_FIELDS = [
   "Languages"
 ];
 const QUADRANT_DESCRIPTIONS = {
-  analytics: "Tools and methods that turn raw observations into analysis, models, forecasts, and decisions.",
-  visualization: "Interfaces and rendering tools that make observations explorable, interpretable, and shareable.",
-  data: "Catalogs, platforms, and data-access tooling used to discover, retrieve, and work with mission datasets.",
+  analytics: "Tools and libraries for processing, analysing, and modelling Earth and space data.",
+  visualization: "Reusable libraries, components, and tools for visualizing Earth and space data.",
+  data: "Catalogs, archives, and repositories providing Earth and space datasets.",
   standards: "Shared formats, metadata models, and protocols that make systems interoperable and results reproducible."
 };
 
@@ -352,14 +352,14 @@ async function loadRadarData(mode) {
   };
 }
 
-function appendQuadrantDetails(body, data) {
+function appendQuadrantDetails(body, data, createButton) {
   if (!body || !data) return;
 
   const details = document.createElement("section");
   details.className = "quadrant-details";
 
   const detailsTitle = document.createElement("h2");
-  detailsTitle.textContent = "Quadrant Guide";
+  detailsTitle.textContent = "Quadrants";
   details.appendChild(detailsTitle);
 
   const byQuadrant = d3.group(
@@ -384,19 +384,21 @@ function appendQuadrantDetails(body, data) {
     const techTitle = document.createElement("h4");
     techTitle.textContent = "Technologies in this quadrant";
 
-    const list = document.createElement("ul");
     const entries = (byQuadrant.get(index) || []).slice().sort((left, right) =>
       left.name.localeCompare(right.name)
     );
-
-    const entryNames = entries.length
-      ? entries.map((entry) => entry.name)
-      : ["No technologies currently listed in this mode."];
-    entryNames.forEach((name) => {
-      const item = document.createElement("li");
-      item.textContent = name;
-      list.appendChild(item);
-    });
+    const list = document.createElement(entries.length ? "ul" : "p");
+    if (entries.length) {
+      list.className = "technology-list";
+      list.setAttribute("role", "list");
+      entries.forEach((entry) => {
+        const item = document.createElement("li");
+        item.appendChild(createButton(entry));
+        list.appendChild(item);
+      });
+    } else {
+      list.textContent = "No technologies currently listed in this mode.";
+    }
 
     section.append(title, description, techTitle, list);
     details.appendChild(section);
@@ -405,13 +407,13 @@ function appendQuadrantDetails(body, data) {
   body.appendChild(details);
 }
 
-function renderStory(markdown, data) {
+function renderStory(markdown, data, createButton) {
   const section = $("story-section");
   const body = $("story-body");
   if (!section || !body) return;
 
   body.innerHTML = markdown && markdown.trim() ? marked.parse(markdown) : "";
-  appendQuadrantDetails(body, data);
+  appendQuadrantDetails(body, data, createButton);
   section.hidden = !body.textContent.trim();
 }
 
@@ -763,7 +765,12 @@ function createEntryButton(entry, color, openEntryPopup, setHover) {
 
   button.addEventListener("click", (event) => {
     event.stopPropagation();
-    openEntryPopup(entry, { x: event.clientX, y: event.clientY });
+    let point = { x: event.clientX, y: event.clientY };
+    if (event.detail === 0) {
+      const rect = button.getBoundingClientRect();
+      point = { x: rect.right, y: rect.top + rect.height / 2 };
+    }
+    openEntryPopup(entry, point);
   });
   button.addEventListener("mouseenter", () => setHover(entry.id));
   button.addEventListener("mouseleave", () => setHover(null));
@@ -773,22 +780,33 @@ function createEntryButton(entry, color, openEntryPopup, setHover) {
   return button;
 }
 
-function appendEntryButtons(entries, container, color, openEntryPopup, setHover, entryButtons) {
-  const colorFor = typeof color === "function" ? color : () => color;
-
+function appendEntryButtons(entries, container, createButton) {
   entries
     .slice()
     .sort((left, right) => left.name.localeCompare(right.name))
     .forEach((entry) => {
-      const button = createEntryButton(entry, colorFor(entry), openEntryPopup, setHover);
-      entryButtons.set(entry.id, button);
-      container.appendChild(button);
+      container.appendChild(createButton(entry));
     });
+}
+
+function appendQuadrantColumns(entries, container, createButton) {
+  const sortedEntries = entries.slice().sort((left, right) => left.name.localeCompare(right.name));
+  const columnCount = sortedEntries.length > 6 ? 2 : 1;
+  const entriesPerColumn = Math.ceil(sortedEntries.length / columnCount);
+
+  for (let index = 0; index < columnCount; index += 1) {
+    const column = document.createElement("div");
+    column.className = "entry-column";
+    const start = index * entriesPerColumn;
+    sortedEntries.slice(start, start + entriesPerColumn).forEach((entry) => {
+      column.appendChild(createButton(entry));
+    });
+    container.appendChild(column);
+  }
 }
 
 function renderRadar(data, popupController) {
   popupController.hide();
-  renderStory(data.storyMarkdown, data);
 
   const center = RADAR.size * 0.5;
   const ringCount = Math.max(1, data.rings.length);
@@ -870,7 +888,7 @@ function renderRadar(data, popupController) {
   let activeId = null;
   let hoverId = null;
   let hoverQuadrant = null;
-  const entryButtons = new Map();
+  const entryButtons = [];
   let hideTimer = null;
 
   const clearHideTimer = () => {
@@ -897,7 +915,7 @@ function renderRadar(data, popupController) {
         hoverQuadrant !== null && !entry.isCore && entry.quadrant === hoverQuadrant
       );
 
-    entryButtons.forEach((button, id) => {
+    entryButtons.forEach(({ button, id }) => {
       button.classList.toggle("active", id === activeId);
       button.classList.toggle("hovered", id === hoverId);
     });
@@ -993,10 +1011,16 @@ function renderRadar(data, popupController) {
     }
   });
 
+  const createButton = (entry) => {
+    const button = createEntryButton(entry, colorForEntry(entry), openEntryPopup, setHover);
+    entryButtons.push({ id: entry.id, button });
+    return button;
+  };
+
   if (coreList) {
     coreList.section.style.setProperty("--core-list-color", coreColor);
     coreList.section.hidden = !coreNodes.length;
-    appendEntryButtons(coreNodes, coreList.entries, coreColor, openEntryPopup, setHover, entryButtons);
+    appendEntryButtons(coreNodes, coreList.entries, createButton);
   }
 
   cornerSections.forEach((section) => {
@@ -1034,16 +1058,10 @@ function renderRadar(data, popupController) {
     section.classList.toggle("is-dense", quadrantEntries.length >= 7);
     section.classList.toggle("is-very-dense", quadrantEntries.length >= 12);
 
-    appendEntryButtons(
-      quadrantEntries,
-      wrap,
-      (entry) => colorByQuadrant(entry.quadrant),
-      openEntryPopup,
-      setHover,
-      entryButtons
-    );
+    appendQuadrantColumns(quadrantEntries, wrap, createButton);
   });
 
+  renderStory(data.storyMarkdown, { ...data, entries: nodes }, createButton);
   rebalanceQuadrantPanels(cornerSections);
   window.requestAnimationFrame(() => rebalanceQuadrantPanels(cornerSections));
 }

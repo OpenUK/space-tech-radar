@@ -21,6 +21,19 @@ Contributions are welcome:
 - Fixes to broken links, outdated descriptions and missing tags
 - Examples and case studies for the story sections
 
+## Disclaimer
+
+This radar is human-maintained and reflects the judgement of its contributors. Please do not submit LLM-generated edits; contributions should be written and checked by a human.
+
+## Litmus Test
+
+Candidates should be open source tools, open standards, openly accessible observation data repositories or reusable techniques, and meet at least one of these tests:
+
+- **Designed for the domain:** built for satellite Earth observation or space science in Analytics, Visualization, Data or Standards.
+- **Critical foundation:** a core building block of established observation workflows, even if designed for wider use (for example Xarray or GDAL). Explain its role and link to a concrete workflow in `Comment`.
+
+For example, being able to open satellite imagery alone does not qualify a general GIS application such as QGIS. Simulation tools need a direct role in analysing or interpreting observations.
+
 ## What It Includes
 
 - Earth and Space toggle
@@ -28,41 +41,33 @@ Contributions are welcome:
 - Side entry panels by quadrant
 - Markdown-driven story section
 
-## Quadrants
+## Categories
 
-- Core Libraries (inner circle)
-- Visualization
-- Analytics
-- Data
-- Standards
+**Ring:** adoption status. **Quadrant:** area of use. **Tag:** descriptive label.
 
-## Standards Sections
+**CORE:** foundational libraries. **Analytics:** processing and analysis. **Visualization:** reusable data visualisation tools. **Data:** catalogs, archives and repositories. **Standards:** formats, metadata and protocols.
 
-- Narrative
-- Fast Adopters
-- Open Data
-- Commonalities
-- Core Open Source Libraries
-- Future
-
-## Tagging
-
-- Techniques
-- Platform
-- Core Library
-- Server-Side
-- Web-Tools
-- Desktop
-- Mobile
-- Data Repository
-- Database
-- Data management
-- Spatial analysis
-- EO visualization
-- Location parsing and EO referencing
-- Remote sensing analysis
-- Pangeo
-- Simulation
+| Ring | Quadrant | Tag |
+| --- | --- | --- |
+| Core | CORE | Techniques |
+| Adopt | Analytics | Platform |
+| Trial | Visualization | Core Library |
+| Assess | Data | Server-Side |
+| Hold | Standards | Web-Tools |
+| Dead |  | Desktop |
+|  |  | Mobile |
+|  |  | Data Repository |
+|  |  | Database |
+|  |  | Data management |
+|  |  | Spatial analysis |
+|  |  | EO visualization |
+|  |  | Location parsing and EO referencing |
+|  |  | Remote sensing analysis |
+|  |  | Pangeo |
+|  |  | 3D modeling |
+|  |  | Cartography and visualisation |
+|  |  | Geocoding and georeferencing |
+|  |  | Simulation |
 
 ## Run Locally
 

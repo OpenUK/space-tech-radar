@@ -22,6 +22,8 @@ for path in ("config/eo.csv", "config/space.csv"):
             errors.append(f"{name}: bad quadrant {r['Quadrant']}")
         if r["Ring"] not in rules["ring"]:
             errors.append(f"{name}: bad ring {r['Ring']}")
+        if r["Ring"] != "Dead" and not re.fullmatch(r"https://github\.com/[\w.-]+/[\w.-]+/?", r["Link"]):
+            errors.append(f"{name}: Link must be a GitHub repository")
         try:
             tags = json.loads(r["Tags"])
         except ValueError:
