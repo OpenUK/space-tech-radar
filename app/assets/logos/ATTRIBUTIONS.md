@@ -32,3 +32,9 @@ the [R logo page](https://www.r-project.org/logo/).
 The Julia logo is copyright 2012-2022 Stefan Karpinski, distributed under
 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
 See the [original license](https://github.com/JuliaLang/julia-logo-graphics/blob/master/LICENSE.md).
+
+## Maintainer logo
+
+`lampata.svg` identifies Lampata in the README. The unchanged artwork was retrieved
+from [Lampata's website](https://lampata.co.uk/assets/Lampata-CP5nD5du.svg)
+on 27 October 2026.

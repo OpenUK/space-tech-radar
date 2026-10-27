@@ -83,3 +83,12 @@ python3 tests/validate_entries.py
 ```
 
 Checks that every entry in `radar/eo.csv` and `radar/space.csv` uses a quadrant, ring and tags listed in `radar/rules.csv`, and that names are not duplicated (including `Dead` entries).
+
+## Maintainers
+
+Maintained by:
+[Lampata](https://lampata.co.uk/)
+
+<a href="https://lampata.co.uk/">
+  <img src="app/assets/logos/lampata.svg" alt="Lampata" width="240" />
+</a>
