@@ -1,3 +1,5 @@
+import { renderReport } from "./report-figures.js";
+
 const RADAR = {
   size: 980,
   outer: 485,
@@ -37,11 +39,11 @@ const CORE = {
   fallbackColor: "#0f766e"
 };
 const RINGS = [
-  { name: "Core", color: "#0f766e" },
-  { name: "Adopt", color: "#1e9f5b" },
-  { name: "Trial", color: "#1f83c2" },
-  { name: "Assess", color: "#d79a00" },
-  { name: "Hold", color: "#c8553d" }
+  { name: "Core", color: "#0f766e", description: "Foundational technologies that underpin the wider ecosystem." },
+  { name: "Adopt", color: "#1e9f5b", description: "Established technologies recommended for regular use." },
+  { name: "Trial", color: "#1f83c2", description: "Promising technologies to try in a limited project before wider adoption." },
+  { name: "Assess", color: "#d79a00", description: "Technologies worth exploring to understand their potential and suitability." },
+  { name: "Hold", color: "#c8553d", description: "Use with caution; consider alternatives before starting new work." }
 ];
 const QUADRANTS = ["Analytics", "Visualization", "Data", "Standards"];
 const REQUIRED_ENTRY_FIELDS = [
@@ -348,7 +350,8 @@ async function loadRadarData(mode) {
     quadrants,
     quadrantColors,
     entries,
-    storyMarkdown
+    storyMarkdown,
+    report: { mode: mode.key, label: mode.word, root: mode.root }
   };
 }
 
@@ -412,8 +415,12 @@ function renderStory(markdown, data, createButton) {
   const body = $("story-body");
   if (!section || !body) return;
 
-  body.innerHTML = markdown && markdown.trim() ? marked.parse(markdown) : "";
-  appendQuadrantDetails(body, data, createButton);
+  // Resolve narrative-relative images while the parsed markup is still inert.
+  const template = document.createElement("template");
+  template.innerHTML = markdown && markdown.trim() ? marked.parse(markdown) : "";
+  appendQuadrantDetails(template.content, data, createButton);
+  renderReport(template.content, data);
+  body.replaceChildren(template.content);
   section.hidden = !body.textContent.trim();
 }
 
@@ -1112,15 +1119,48 @@ function showLoadError(error) {
   }
 }
 
+function hideLegendTooltips() {
+  document.querySelectorAll(".legend-tooltip").forEach((tooltip) => { tooltip.hidden = true; });
+}
+
 function renderLegend(entries) {
   $("radar-legend")?.replaceChildren(
     ...RINGS.map((ring, index) => {
       const item = document.createElement("li");
       item.style.setProperty("--dot", ring.color);
-      item.append(
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "legend-trigger";
+      const tooltip = document.createElement("span");
+      tooltip.id = `ring-tooltip-${index}`;
+      tooltip.className = "legend-tooltip";
+      tooltip.setAttribute("role", "tooltip");
+      tooltip.textContent = ring.description;
+      tooltip.hidden = true;
+      button.setAttribute("aria-describedby", tooltip.id);
+      button.append(
         d3.create("span").attr("class", "legend-name").text(ring.name).node(),
         d3.create("span").attr("class", "legend-count").text(entries.filter((entry) => entry.ring === index).length).node()
       );
+      const showTooltip = () => {
+        hideLegendTooltips();
+        tooltip.hidden = false;
+        const rect = button.getBoundingClientRect();
+        tooltip.style.left = `${clamp(rect.left + (rect.width - tooltip.offsetWidth) / 2, 12, window.innerWidth - tooltip.offsetWidth - 12)}px`;
+        tooltip.style.top = `${rect.bottom + tooltip.offsetHeight <= window.innerHeight - 12
+          ? rect.bottom
+          : Math.max(12, rect.top - tooltip.offsetHeight)}px`;
+      };
+      item.addEventListener("mouseenter", showTooltip);
+      item.addEventListener("mouseleave", () => {
+        if (document.activeElement !== button) tooltip.hidden = true;
+      });
+      button.addEventListener("focus", showTooltip);
+      button.addEventListener("blur", () => {
+        if (!item.matches(":hover")) tooltip.hidden = true;
+      });
+      button.addEventListener("click", showTooltip);
+      item.append(button, tooltip);
       return item;
     })
   );
@@ -1155,6 +1195,7 @@ async function toggleMode() {
 
 document.addEventListener("click", (event) => {
   const target = event.target;
+  if (!(target instanceof Element) || !target.closest(".legend")) hideLegendTooltips();
   if (!popupController.isVisible()) return;
   if (!(target instanceof Element)) {
     popupController.hide();
@@ -1166,8 +1207,14 @@ document.addEventListener("click", (event) => {
 });
 
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") popupController.hide();
+  if (event.key === "Escape") {
+    popupController.hide();
+    hideLegendTooltips();
+  }
 });
+
+window.addEventListener("resize", hideLegendTooltips);
+window.addEventListener("scroll", hideLegendTooltips, true);
 
 toggleWordButton?.addEventListener("click", toggleMode);
 toggleVisualButton?.addEventListener("click", toggleMode);

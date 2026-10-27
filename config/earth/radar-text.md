@@ -27,11 +27,14 @@ So the role of open source in Earth Observation is not just theoretical, and it 
 
 When you talk about open source in Earth Observation, you can't really separate it from open data. The tools only matter if people can actually get to the data, reuse it, and work with it.
 
-This is one of the foundations the whole open-source EO community is built on. When data is open, it lowers the bar for getting started. It means researchers can reproduce each other's work. It means public agencies, startups, and everyday users aren't all reinventing the wheel or locked out by proprietary silos. Landsat, Sentinel, Copernicus: these programmes have shown just how much becomes possible when EO data is genuinely accessible.
+This is one of the foundations the whole open-source EO community is built on. When data is open, it lowers the bar for getting started. It means researchers can reproduce each other's work. It means public agencies, startups, and everyday users aren't all reinventing the wheel or locked out by proprietary silos. Landsat, Sentinel, Copernicus: these programmes have shown just how much becomes possible when EO data is genuinely accessible. And the scale of that access has grown enormously. The volume of Sentinel data being downloaded each year has risen dramatically, showing just how much use is being made of this openly available data.
 
-[do a chart of the amount of open EO data exploding]
+<!-- report-figure: sentinel-downloads -->
 
-There's also a huge amount of often unglamorous work that goes into making that data usable in practice. Standards, metadata, interoperable formats: none of it is exciting on its own, but without it, "open" data is just data you can technically download but can't actually do much with.
+![copernicus_2024_data_downloads_report](../../app/assets/copernicus_2024_data_downloads_report.svg)
+*Annual volume of Sentinel data downloaded by users, 2015–2024. Source: Copernicus Data Space Ecosystem Annual Report 2024, Figure 44, p. 55.*
+
+But making data available is only part of the story. There's also a huge amount of often unglamorous work that goes into making that data usable in practice. Standards, metadata, interoperable formats: none of it is exciting on its own, but without it, "open" data is just data you can technically download but can't actually do much with.
 
 And increasingly, the conversation has moved beyond the data itself. Open data is still at the heart of things, but people are paying just as much attention now to the infrastructure around it. Shared platforms, reusable analysis workflows, the connective tissue that turns raw openness into something a community can build on together.
 
@@ -49,10 +52,34 @@ So the split in EO is often less about "who uses EO" and more about how they use
 Think of your local council in the UK. Although they wouldn't necessarily build a EO pipeline for finding potholes using satellite data, they might buy the intelligence from a company that almost definitely uses open source to analyse roads.
 
 
+<!-- report-figure: earth-ecosystem -->
+
 ## What's Common Between Earth and Space Open Source
 
 Earth Observation and space observation might serve different domains, but their open-source communities are solving the same fundamental problems: how to store, discover, position, and analyse observational data. The same ideas keep recurring under different names, and increasingly, the same tools.
 
 Both ecosystems are Python-based and organised around a community core project. In EO, that centre is Pangeo: Xarray, Dask, and Zarr. In space observation, Astropy fills the equivalent role. These are not single tools but gravitational centres for wider ecosystems, and the gap between them is closing. An astropy-xarray bridge already lets astronomical data flow through EO workflows.
 
+Astronomy was also an early adopter of AI, using neural networks to distinguish stars from galaxies by 1992, decades before the current boom. Its experience of classifying noisy imagery offers another source of ideas for EO.
+
 The clearest example of convergence is HEALPix. Built for astronomy to map cosmic background radiation, it divides the celestial sphere into hierarchical, equal-area cells. In 2016, researchers in New Zealand adapted it for terrestrial use on the WGS84 ellipsoid. Today, xdggs brings HEALPix into Xarray, and the representation has been adopted in DestinE's Climate Digital Twin. An algorithm designed to map the afterglow of the Big Bang is now tiling the Earth for operational climate projection. The same cross-sharing of ideas appears in data discovery, where the USGS Astrogeology Science Center is prototyping STAC catalogues for Mars and Europa imagery using COG formats from EO
+
+<!-- report-figure: shared-methods -->
+
+## Languages and Frameworks
+
+Earth observation has tools across Python, R and Julia. In Python, Xarray represents labelled datasets and Dask provides parallel computation. R offers spatial analysis through terra and vector geometry tools through sf. Julia's Rasters.jl provides types and operations for reading, writing and manipulating raster data. The useful choice depends on the data formats, methods and existing code in a project.
+
+<!-- report-figure: languages -->
+
+## References
+
+- NASA. [Open Data](https://science.nasa.gov/mission/landsat/open-data/).
+- ESA (2024). [New ESA EO Science Strategy](https://earthcode.esa.int/blog/new-esa-eo-science-strategy).
+- Copernicus Data Space Ecosystem. [Annual Report 2024](https://s3.waw3-1.cloudferro.com/swift/v1/portal_uploads_prod/Copernicus_Annual_Report_2024.pdf), Figure 44, p. 55.
+- ESA. [Six trends to watch in commercial Earth observation](https://www.esa.int/Applications/Observing_the_Earth/Six_trends_to_watch_in_commercial_Earth_observation).
+- EUSPA (2024). [EO and GNSS Market Report](https://www.euspa.europa.eu/sites/default/files/external/publications/euspa_market_report_2024.pdf).
+- [Pangeo](https://pangeo.io/) and [About OSGeo](https://www.osgeo.org/about/).
+- Gibb, R. G. (2016). [The rHEALPix Discrete Global Grid System](https://doi.org/10.1088/1755-1315/34/1/012012). IOP Conference Series: Earth and Environmental Science, 34, 012012.
+- [GRID4EARTH](https://grid4earth.eu/).
+- Odewahn et al. (1992). [Automated star/galaxy discrimination with neural networks](https://doi.org/10.1086/116063).
