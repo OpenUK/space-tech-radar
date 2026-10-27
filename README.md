@@ -66,18 +66,6 @@ This radar is human-maintained and reflects the judgement of its contributors. P
 |  |  | Geocoding and georeferencing |
 |  |  | Simulation |
 
-## Run Locally
-
-Serve the repository root:
-
-```bash
-python3 -m http.server 8080
-```
-
-Open `http://localhost:8080`.
-
-
-
 ## Test
 
 ```bash
