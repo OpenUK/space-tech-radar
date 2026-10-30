@@ -1,3 +1,5 @@
+import { renderCountryMap } from "./country-map.js";
+
 // Report figures use local data only; source links are citations, never fetches.
 const SOURCES = {
   copernicus: {
@@ -116,6 +118,18 @@ function dataDetails(content, summary = "View data table") {
   const details = el("details", "figure-data");
   details.append(el("summary", "", summary), content);
   return details;
+}
+
+function geography(context) {
+  const result = figure(context, "eo-geography", "EO open source around the world");
+  result.content.append(el("p", "figure-unit", "Loading country locations…"));
+  renderCountryMap(result.content).catch(() => {
+    result.content.replaceChildren(el("p", "figure-unit", "Country locations could not be loaded."));
+  });
+  const sources = el("span", "figure-sources");
+  sources.append("Made with ", link("Natural Earth", "https://www.naturalearthdata.com/"));
+  result.description.append(sources);
+  return result.node;
 }
 
 // Text stays in HTML so it wraps and remains legible when the SVG bar shrinks.
@@ -441,6 +455,7 @@ export function renderReport(body, data) {
     if (!key) return;
     if (seen.has(key)) { marker.remove(); return; }
     let node;
+    if (context.mode === "earth" && key === "eo-geography") node = geography(context);
     if (key === "languages") node = languages(context);
     if (key === "shared-methods") node = sharedMethods(context);
     if (context.mode === "earth" && key === "sentinel-downloads") node = sentinel(context, marker);

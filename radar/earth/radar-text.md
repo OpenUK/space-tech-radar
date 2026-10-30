@@ -15,7 +15,9 @@ Open source Earth Observation tools are often sustained by open science / open s
 
 That matters because very few teams want to build an EO stack from scratch, and almost none should. Modern downstream workflows depend on shared building blocks for coordinate reference systems, raster and vector I/O, point cloud processing, metadata, cloud-native storage, scalable analysis, tiling, and machine learning. A large part of that foundation is open. Technologies such as GDAL, PROJ, GeoTIFF are not side tools at the edge of the ecosystem; they are part of the base layer that makes the ecosystem work at all. Even where the final application is commercial or proprietary, the underlying stack is often built on open components.
 
-This is one reason open source has had such an outsized influence in EO. The field has long been shaped by open science as much as by software engineering. Many of the tools, standards, and workflows now used in practice originated in research institutions, government agencies, and academic communities before spreading into wider use.
+This is one reason open source has had such an outsized influence in EO. The field has long been shaped by open science as much as by software engineering. Many of the tools, standards, and workflows used today are shaped by global collaboration between research institutions, public agencies, and open source communities with strong representation in the US, Germany, France and UK.
+
+<!-- report-figure: eo-geography -->
 
 A large share of these foundational tools has come from a mix of research institutions, public agencies, and open technical communities. Open source has been one of the main routes by which methods move from missions and laboratories into civil, humanitarian, and commercial workflows. It lowers the barrier to entry, supports reproducibility, and makes it far easier to build on existing work instead of rebuilding core parts of a satellite data processing chain from the ground up.
 
