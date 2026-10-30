@@ -19,7 +19,7 @@ This is one reason open source has had such an outsized influence in EO. The fie
 
 <!-- report-figure: eo-geography -->
 
-A large share of these foundational tools has come from a mix of research institutions, public agencies, and open technical communities. Open source has been one of the main routes by which methods move from missions and laboratories into civil, humanitarian, and commercial workflows. It lowers the barrier to entry, supports reproducibility, and makes it far easier to build on existing work instead of rebuilding core parts of a satellite data processing chain from the ground up.
+Open source has been one of the main routes by which methods move from missions and laboratories into civil, humanitarian, and commercial workflows. It lowers the barrier to entry, supports reproducibility, and makes it far easier to build on existing work instead of rebuilding core parts of a satellite data processing chain from the ground up.
 
 At the same time, Earth Observation isn't an entirely open world. Proprietary platforms, closed analytics pipelines, vertically integrated commercial offerings, and defence-led systems still play a major role. That is the reality of the sector. But downstream EO still leans heavily on open technologies because they make interoperability possible and innovation faster. Open standards and open source tooling allow different datasets, platforms, and organisations to work together in ways that closed stacks rarely do well. 
 
