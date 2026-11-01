@@ -77,6 +77,7 @@ Checks that every entry in `radar/eo.csv` and `radar/space.csv` uses a quadrant,
 ## Maintainers
 
 - [@sunnydean](https://github.com/sunnydean)
+- [@maxamg](https://github.com/maxamg)
 
 ## Supported By
 
@@ -87,5 +88,9 @@ Checks that every entry in `radar/eo.csv` and `radar/space.csv` uses a quadrant,
   &nbsp;&nbsp;
   <a href="https://lampata.co.uk/">
     <img src="app/assets/logos/lampata.svg" alt="Lampata" width="240" />
+  </a>
+  &nbsp;&nbsp;
+  <a href="https://thoughtworks.com/">
+    <img src="app/assets/logos/thoughtworks.png" alt="Thoughtworks" width="240" />
   </a>
 </p>
